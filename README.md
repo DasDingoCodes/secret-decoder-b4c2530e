@@ -1,4 +1,54 @@
-# Welcome to your Lovable project
+# Secret Decoder Application
+
+This is a secure web application that requires a 6-digit passcode to reveal hidden content including a background image, text message, and audio file.
+
+## Security Features
+
+- Passcode is stored as SHA-256 hash only
+- Assets (image, audio, text) are base64 encoded
+- Assets are only decoded and displayed when correct passcode is entered
+
+## Encoding Assets Script
+
+To generate secure hashes and encoded assets for your application, use the provided Node.js script:
+
+### Prerequisites
+- Node.js installed on your system
+
+### Usage
+
+1. **Prepare your assets:**
+   - A 6-digit passcode (e.g., 123456)
+   - An image file (JPEG, PNG, etc.)
+   - An audio file (MP3, WAV, etc.) 
+   - Text content you want to reveal
+
+2. **Run the encoding script:**
+   ```bash
+   node scripts/encode-assets.js <passcode> <image-path> <audio-path> <text-content>
+   ```
+
+   **Example:**
+   ```bash
+   node scripts/encode-assets.js 123456 ./secret-image.jpg ./secret-audio.mp3 "THE ANCIENT WISDOM HAS BEEN UNLOCKED"
+   ```
+
+3. **Update your application:**
+   - Copy the generated `PASSCODE_HASH` to replace the value in `src/pages/Index.tsx`
+   - Copy the `ENCODED_IMAGE` to replace the value in `src/pages/Index.tsx`
+   - Copy the `ENCODED_AUDIO` to replace the value in `src/pages/Index.tsx` 
+   - Copy the `ENCODED_TEXT` to replace the value in `src/pages/Index.tsx`
+
+4. **Example output:**
+   ```
+   ✅ Results:
+   Passcode Hash: 8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92
+   Encoded Image (first 100 chars): /9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYW...
+   Encoded Audio (first 100 chars): UklGRiQEAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAEAAD//f//...
+   Encoded Text: VEhFIEFOQ0lFTlQgV0lTRE9NIEhBUyBCRUVOIFVOTE9DS0VE
+   ```
+
+The script will also generate an `encoded-assets.json` file with all the encoded data for backup purposes.
 
 ## Project info
 
