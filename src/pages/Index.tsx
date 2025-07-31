@@ -79,8 +79,8 @@ const Index = () => {
           const key = await deriveKey(code);
 
           try {
-            const text = (await loadAndDecryptAsset("/src/assets/encoded-text.enc", key, true)) as string;
-            const imageBuffer = (await loadAndDecryptAsset("/src/assets/encoded-image.enc", key)) as ArrayBuffer;
+            const text = (await loadAndDecryptAsset("/encoded-text.enc", key, true)) as string;
+            const imageBuffer = (await loadAndDecryptAsset("/encoded-image.enc", key)) as ArrayBuffer;
             const imageBase64 = btoa(String.fromCharCode(...new Uint8Array(imageBuffer)));
             const imageUrl = `data:image/jpeg;base64,${imageBase64}`;
             setImageUrl(imageUrl);
