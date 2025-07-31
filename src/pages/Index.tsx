@@ -57,7 +57,7 @@ const Index = () => {
   useEffect(() => {
     const loadHash = async () => {
       try {
-        const res = await fetch("/src/assets/passcode-hash.txt");
+        const res = await fetch("/passcode-hash.txt");
         const hashText = await res.text();
         setPasscodeHash(hashText.trim());
       } catch (err) {
