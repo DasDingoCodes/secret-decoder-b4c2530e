@@ -1,37 +1,56 @@
 #!/usr/bin/env node
 
-const crypto = require('crypto');
-const fs = require('fs');
-const path = require('path');
+import crypto from "crypto";
+import fs from "fs";
+import path from "path";
 
-function hashPasscode(passcode) {
-  return crypto.createHash('sha256').update(passcode).digest('hex');
+const SALT = "my-static-salt"; // Change this or randomize it if you're storing it separately
+
+function deriveKey(passcode) {
+  return crypto.pbkdf2Sync(passcode, SALT, 100000, 32, 'sha256'); // 32 bytes = 256-bit key
 }
 
-function encodeFile(filePath) {
+function encryptData(dataBuffer, key) {
+  const iv = crypto.randomBytes(16);
+  const cipher = crypto.createCipheriv("aes-256-cbc", key, iv);
+  const encrypted = Buffer.concat([cipher.update(dataBuffer), cipher.final()]);
+  return `${iv.toString('hex')}:${encrypted.toString('base64')}`;
+}
+
+function readFileAsBuffer(filePath) {
   try {
-    const fileBuffer = fs.readFileSync(filePath);
-    return fileBuffer.toString('base64');
+    return fs.readFileSync(filePath);
   } catch (error) {
     console.error(`Error reading file ${filePath}:`, error.message);
     process.exit(1);
   }
 }
 
-function encodeText(text) {
-  return Buffer.from(text, 'utf8').toString('base64');
+function readTextFile(filePath) {
+  try {
+    return fs.readFileSync(filePath, 'utf8');
+  } catch (error) {
+    console.error(`Error reading text file ${filePath}:`, error.message);
+    process.exit(1);
+  }
+}
+
+function ensureDirExists(dirPath) {
+  if (!fs.existsSync(dirPath)) {
+    fs.mkdirSync(dirPath, { recursive: true });
+  }
 }
 
 function main() {
   const args = process.argv.slice(2);
   
   if (args.length !== 4) {
-    console.log('Usage: node encode-assets.js <6-digit-code> <image-path> <audio-path> <text-content>');
-    console.log('Example: node encode-assets.js 123456 ./secret.jpg ./secret.mp3 "SECRET MESSAGE"');
+    console.log('Usage: node encode-assets.js <6-digit-code> <image-path> <audio-path> <text-file-path>');
+    console.log('Example: node encode-assets.js 123456 ./secret.jpg ./secret.mp3 ./message.txt');
     process.exit(1);
   }
 
-  const [passcode, imagePath, audioPath, textContent] = args;
+  const [passcode, imagePath, audioPath, textFilePath] = args;
 
   // Validate passcode
   if (!/^\d{6}$/.test(passcode)) {
@@ -39,55 +58,37 @@ function main() {
     process.exit(1);
   }
 
-  // Validate file paths
-  if (!fs.existsSync(imagePath)) {
-    console.error(`Error: Image file not found: ${imagePath}`);
-    process.exit(1);
-  }
-
-  if (!fs.existsSync(audioPath)) {
-    console.error(`Error: Audio file not found: ${audioPath}`);
-    process.exit(1);
-  }
-
-  console.log('🔐 Encoding assets...\n');
-
-  const hashedPasscode = hashPasscode(passcode);
-  const encodedImage = encodeFile(imagePath);
-  const encodedAudio = encodeFile(audioPath);
-  const encodedText = encodeText(textContent);
-
-  console.log('✅ Results:');
-  console.log('='.repeat(50));
-  console.log(`Passcode Hash: ${hashedPasscode}`);
-  console.log(`\nEncoded Image (first 100 chars): ${encodedImage.substring(0, 100)}...`);
-  console.log(`Image full length: ${encodedImage.length} characters`);
-  console.log(`\nEncoded Audio (first 100 chars): ${encodedAudio.substring(0, 100)}...`);
-  console.log(`Audio full length: ${encodedAudio.length} characters`);
-  console.log(`\nEncoded Text: ${encodedText}`);
-
-  // Save to output file
-  const output = {
-    passcodeHash: hashedPasscode,
-    encodedImage,
-    encodedAudio,
-    encodedText,
-    metadata: {
-      originalImagePath: imagePath,
-      originalAudioPath: audioPath,
-      originalText: textContent,
-      generatedAt: new Date().toISOString()
+  for (const file of [imagePath, audioPath, textFilePath]) {
+    if (!fs.existsSync(file)) {
+      console.error(`Error: File not found: ${file}`);
+      process.exit(1);
     }
-  };
+  }
 
-  const outputPath = 'encoded-assets.json';
-  fs.writeFileSync(outputPath, JSON.stringify(output, null, 2));
-  console.log(`\n💾 Full output saved to: ${outputPath}`);
-  console.log('\n📋 Copy these values to your application code:');
+  console.log('🔐 Encrypting assets...\n');
+
+  const key = deriveKey(passcode);
+
+  const encryptedImage = encryptData(readFileAsBuffer(imagePath), key);
+  const encryptedAudio = encryptData(readFileAsBuffer(audioPath), key);
+  const encryptedText = encryptData(Buffer.from(readTextFile(textFilePath), 'utf8'), key);
+
+  const hashedPasscode = crypto.createHash('sha256').update(passcode).digest('hex');
+
+  const outputDir = path.join('src', 'assets');
+  ensureDirExists(outputDir);
+
+  fs.writeFileSync(path.join(outputDir, 'encoded-image.enc'), encryptedImage);
+  fs.writeFileSync(path.join(outputDir, 'encoded-audio.enc'), encryptedAudio);
+  fs.writeFileSync(path.join(outputDir, 'encoded-text.enc'), encryptedText);
+  fs.writeFileSync(path.join(outputDir, 'passcode-hash.txt'), hashedPasscode);
+
+  console.log('✅ Assets encrypted and saved:');
+  console.log(`- Image: ${outputDir}/encoded-image.enc`);
+  console.log(`- Audio: ${outputDir}/encoded-audio.enc`);
+  console.log(`- Text : ${outputDir}/encoded-text.enc`);
+  console.log('\n📋 Store this in your app to verify passcode input:');
   console.log(`PASSCODE_HASH: "${hashedPasscode}"`);
-  console.log(`ENCODED_IMAGE: "${encodedImage}"`);
-  console.log(`ENCODED_AUDIO: "${encodedAudio}"`);
-  console.log(`ENCODED_TEXT: "${encodedText}"`);
 }
 
 main();
