@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import ConfettiEffect from "@/components/ConfettiEffect";
 
 const SALT = "my-static-salt"; // Must match the encoder
 
@@ -50,6 +51,7 @@ const Index = () => {
   const [showBackground, setShowBackground] = useState(false);
   const [invalid, setInvalid] = useState(false);
   const [passcodeHash, setPasscodeHash] = useState<string | null>(null);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   // Load hash from file on first render
   useEffect(() => {
@@ -72,6 +74,7 @@ const Index = () => {
         if (hash === passcodeHash) {
           setIsRevealed(true);
           setInvalid(false);
+          setShowConfetti(true);
 
           const key = await deriveKey(code);
 
@@ -113,6 +116,7 @@ const Index = () => {
     setRevealedText("");
     setShowBackground(false);
     setInvalid(false);
+    setShowConfetti(false);
   };
 
   if (isRevealed && imageUrl) {
@@ -144,6 +148,7 @@ const Index = () => {
             </button>
           </div>
         </div>
+        <ConfettiEffect trigger={showConfetti} />
       </div>
     );
   }
