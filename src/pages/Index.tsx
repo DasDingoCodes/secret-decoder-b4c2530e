@@ -49,6 +49,7 @@ const Index = () => {
   const [revealedText, setRevealedText] = useState("");
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [imageTileUrl, setImageTileUrl] = useState<string | null>(null);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [showBackground, setShowBackground] = useState(false);
   const [invalid, setInvalid] = useState(false);
   const [passcodeHash, setPasscodeHash] = useState<string | null>(null);
@@ -91,6 +92,11 @@ const Index = () => {
             const tileUrl = `data:image/jpeg;base64,${imageTileBase64}`;
             setImageTileUrl(tileUrl);
 
+            const audioBuffer = (await loadAndDecryptAsset("/encoded-audio.enc", key)) as ArrayBuffer;
+            const audioBlob = new Blob([audioBuffer], { type: "audio/mp3" });
+            const audioObjectUrl = URL.createObjectURL(audioBlob);
+            setAudioUrl(audioObjectUrl);
+
             setTimeout(() => setShowBackground(true), 500);
             animateText(text);
           } catch (err) {
@@ -106,6 +112,15 @@ const Index = () => {
 
     tryReveal();
   }, [code, isRevealed, passcodeHash]);
+
+  useEffect(() => {
+    if (audioUrl) {
+      const audio = new Audio(audioUrl);
+      audio.play().catch((err) => {
+        console.error("Audio playback failed:", err);
+      });
+    }
+  }, [audioUrl]);
 
   const animateText = (text: string) => {
     let index = 0;
@@ -123,6 +138,10 @@ const Index = () => {
     setShowBackground(false);
     setInvalid(false);
     setShowConfetti(false);
+    setAudioUrl((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return null;
+    });
   };
 
   if (isRevealed && imageUrl && imageTileUrl) {
