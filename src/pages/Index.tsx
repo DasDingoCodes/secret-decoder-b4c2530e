@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import ConfettiEffect from "@/components/ConfettiEffect";
 
@@ -50,6 +50,9 @@ const Index = () => {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [imageTileUrl, setImageTileUrl] = useState<string | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [isMuted, setIsMuted] = useState(false);
+  const [volume, setVolume] = useState(0.25); // 25%
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const [showBackground, setShowBackground] = useState(false);
   const [invalid, setInvalid] = useState(false);
   const [passcodeHash, setPasscodeHash] = useState<string | null>(null);
@@ -116,11 +119,28 @@ const Index = () => {
   useEffect(() => {
     if (audioUrl) {
       const audio = new Audio(audioUrl);
+      audio.volume = volume;
+      audio.muted = isMuted;
+      audio.loop = true;
+      audioRef.current = audio;
+
       audio.play().catch((err) => {
         console.error("Audio playback failed:", err);
       });
     }
   }, [audioUrl]);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.muted = isMuted;
+    }
+  }, [isMuted]);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
+    }
+  }, [volume]);
 
   const animateText = (text: string) => {
     let index = 0;
@@ -132,6 +152,21 @@ const Index = () => {
   };
 
   const resetApp = () => {
+    if (audioRef.current) {
+      const fadeOut = () => {
+        const fadeInterval = setInterval(() => {
+          if (audioRef.current && audioRef.current.volume > 0.05) {
+            audioRef.current.volume = Math.max(0, audioRef.current.volume - 0.05);
+          } else {
+            clearInterval(fadeInterval);
+            audioRef.current?.pause();
+            audioRef.current = null;
+          }
+        }, 100);
+      };
+      fadeOut();
+    }
+
     setCode("");
     setIsRevealed(false);
     setRevealedText("");
@@ -188,6 +223,29 @@ const Index = () => {
             >
               Try Again
             </button>
+
+            <div className="mt-6 flex flex-col items-center gap-4">
+              <button
+                onClick={() => setIsMuted((prev) => !prev)}
+                className="px-4 py-2 bg-slate-700 hover:bg-slate-800 text-white rounded shadow"
+              >
+                {isMuted ? "Unmute" : "Mute"}
+              </button>
+
+              <div className="flex items-center gap-2 text-slate-700">
+                <label htmlFor="volume">Volume</label>
+                <input
+                  id="volume"
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value={volume}
+                  onChange={(e) => setVolume(parseFloat(e.target.value))}
+                  className="w-40"
+                />
+              </div>
+            </div>
           </div>
         </div>
 
