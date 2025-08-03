@@ -1,5 +1,7 @@
+import React from "react"
 import { useEffect, useState, useRef } from "react";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import { Volume2, VolumeX } from "lucide-react";
 import ConfettiEffect from "@/components/ConfettiEffect";
 
 const SALT = "my-static-salt"; // Must match the encoder
@@ -207,46 +209,70 @@ const Index = () => {
           </div>
 
           {/* Foreground content */}
-          <div className="relative z-10 text-center px-6 py-12">
-            <h1 className="text-6xl font-bold mb-8 animate-scale-in text-yellow-600 drop-shadow-lg">
-              SUCCESS!
-            </h1>
-            <div className="text-2xl font-mono tracking-wider mb-8 h-8 text-slate-800">
-              {revealedText}
-              {revealedText.length < revealedText.length && (
-                <span className="animate-pulse">|</span>
-              )}
-            </div>
-            <button
-              onClick={resetApp}
-              className="mt-8 px-8 py-3 bg-yellow-600 hover:bg-yellow-700 text-white font-semibold rounded-lg transition-colors duration-200 shadow-lg"
-            >
-              Try Again
-            </button>
+          <div className="relative z-10 flex flex-col justify-between items-center text-center px-6 py-12 w-full max-w-3xl h-full min-h-screen">
 
-            <div className="mt-6 flex flex-col items-center gap-4">
+            {/* Title at Top */}
+            <div className="w-full">
+              <h1 className="text-6xl font-bold mb-8 animate-scale-in text-yellow-600 drop-shadow-lg">
+                SUCCESS!
+              </h1>
+            </div>
+
+            {/* Expanding Text Area (stretches between title and controls) */}
+            <div className="flex-1 overflow-y-auto w-full">
+              <div className="text-xl font-mono tracking-wide text-slate-800 space-y-4 text-left max-w-xl mx-auto leading-relaxed">
+                {revealedText.split("\n\n").map((para, i) => (
+                  <p key={i}>
+                    {para.split("\n").map((line, j) => (
+                      <React.Fragment key={j}>
+                        {line}
+                        <br />
+                      </React.Fragment>
+                    ))}
+                  </p>
+                ))}
+              </div>
+            </div>
+
+            {/* Controls at Bottom */}
+            <div className="w-full mt-12 pt-8 border-t border-slate-300 flex flex-col sm:flex-row justify-center sm:justify-between items-center gap-4">
+
               <button
-                onClick={() => setIsMuted((prev) => !prev)}
-                className="px-4 py-2 bg-slate-700 hover:bg-slate-800 text-white rounded shadow"
+                onClick={resetApp}
+                className="px-6 py-3 bg-yellow-600 hover:bg-yellow-700 text-white font-semibold rounded-xl transition duration-200 shadow"
               >
-                {isMuted ? "Unmute" : "Mute"}
+                Try Again
               </button>
 
-              <div className="flex items-center gap-2 text-slate-700">
-                <label htmlFor="volume">Volume</label>
-                <input
-                  id="volume"
-                  type="range"
-                  min="0"
-                  max="1"
-                  step="0.01"
-                  value={volume}
-                  onChange={(e) => setVolume(parseFloat(e.target.value))}
-                  className="w-40"
-                />
+              <div className="flex items-center gap-4">
+                {/* Icon button for mute */}
+                <button
+                  onClick={() => setIsMuted((prev) => !prev)}
+                  className="w-10 h-10 flex items-center justify-center bg-slate-700 hover:bg-slate-800 text-white rounded-full shadow transition"
+                  aria-label={isMuted ? "Unmute" : "Mute"}
+                >
+                  {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+                </button>
+
+
+                {/* Volume slider */}
+                <div className="flex items-center gap-2">
+                  <label htmlFor="volume" className="text-slate-700 font-medium">Volume</label>
+                  <input
+                    id="volume"
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.01"
+                    value={volume}
+                    onChange={(e) => setVolume(parseFloat(e.target.value))}
+                    className="w-40 h-2 rounded-full bg-slate-200 appearance-none accent-yellow-500 cursor-pointer"
+                  />
+                </div>
               </div>
             </div>
           </div>
+
         </div>
 
         <ConfettiEffect trigger={showConfetti} />
@@ -260,8 +286,7 @@ const Index = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       <div className="text-center p-8 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 shadow-2xl">
-        <h1 className="text-4xl font-bold mb-2 text-white drop-shadow-lg">Secret Decoder</h1>
-        <p className="text-lg text-white/80 mb-8">Enter the 6-digit code to unlock the secret</p>
+        <h1 className="text-4xl font-bold mb-2 text-white drop-shadow-lg">7.5) Secret Decoder</h1>
 
         <div className="mb-8">
           <InputOTP maxLength={6} value={code} onChange={setCode} className="gap-3">
