@@ -287,6 +287,7 @@ const Index = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       <div className="text-center p-8 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 shadow-2xl">
         <h1 className="text-4xl font-bold mb-2 text-white drop-shadow-lg">7.5) Secret Decoder</h1>
+        <p className="text-lg text-white/80 mb-8"></p>
 
         <div className="mb-8">
           <InputOTP maxLength={6} value={code} onChange={setCode} className="gap-3">
