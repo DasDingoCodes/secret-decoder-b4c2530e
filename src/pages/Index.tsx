@@ -48,6 +48,7 @@ const Index = () => {
   const [isRevealed, setIsRevealed] = useState(false);
   const [revealedText, setRevealedText] = useState("");
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [imageTileUrl, setImageTileUrl] = useState<string | null>(null);
   const [showBackground, setShowBackground] = useState(false);
   const [invalid, setInvalid] = useState(false);
   const [passcodeHash, setPasscodeHash] = useState<string | null>(null);
@@ -85,6 +86,11 @@ const Index = () => {
             const imageUrl = `data:image/jpeg;base64,${imageBase64}`;
             setImageUrl(imageUrl);
 
+            const imageTileBuffer = (await loadAndDecryptAsset("/encoded-image-tile.enc", key)) as ArrayBuffer;
+            const imageTileBase64 = btoa(String.fromCharCode(...new Uint8Array(imageTileBuffer)));
+            const tileUrl = `data:image/jpeg;base64,${imageTileBase64}`;
+            setImageTileUrl(tileUrl);
+
             setTimeout(() => setShowBackground(true), 500);
             animateText(text);
           } catch (err) {
@@ -119,26 +125,41 @@ const Index = () => {
     setShowConfetti(false);
   };
 
-  if (isRevealed && imageUrl) {
+  if (isRevealed && imageUrl && imageTileUrl) {
     return (
-      <div className="min-h-screen relative overflow-hidden">
+      <div className="min-h-screen flex bg-white">
+        {/* Left Panel with Tiled Image */}
         <div
-          className={`absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ${
-            showBackground ? "opacity-100" : "opacity-0"
-          }`}
-          style={{ backgroundImage: `url(${imageUrl})` }}
-        >
-          <div className="absolute inset-0 bg-black/40" />
-        </div>
+          className="flex-1 bg-repeat bg-center"
+          style={{ backgroundImage: `url(${imageTileUrl})` }}
+        />
 
-        <div className="relative z-10 min-h-screen flex flex-col items-center justify-center text-white px-4">
-          <div className="text-center animate-fade-in">
-            <h1 className="text-6xl font-bold mb-8 animate-scale-in text-yellow-300 drop-shadow-lg">
+        {/* Middle Panel */}
+        <div className="relative z-10 w-full max-w-3xl min-h-screen flex items-center justify-center bg-white shadow-2xl shadow-black/30 overflow-hidden">
+          {/* Background Image with Gradient Fade */}
+          <div
+            className="absolute inset-0 bg-center bg-no-repeat bg-cover pointer-events-none"
+            style={{
+              backgroundImage: `url(${imageUrl})`,
+              maskImage:
+                "linear-gradient(to right, transparent, black 20%, black 80%, transparent)",
+              WebkitMaskImage:
+                "linear-gradient(to right, transparent, black 20%, black 80%, transparent)",
+            }}
+          >
+            <div className="absolute inset-0 bg-white/50" />
+          </div>
+
+          {/* Content */}
+          <div className="relative z-10 text-center px-6 py-12">
+            <h1 className="text-6xl font-bold mb-8 animate-scale-in text-yellow-600 drop-shadow-lg">
               SUCCESS!
             </h1>
-            <div className="text-2xl font-mono tracking-wider mb-8 h-8">
+            <div className="text-2xl font-mono tracking-wider mb-8 h-8 text-slate-800">
               {revealedText}
-              {revealedText.length < revealedText.length && <span className="animate-pulse">|</span>}
+              {revealedText.length < revealedText.length && (
+                <span className="animate-pulse">|</span>
+              )}
             </div>
             <button
               onClick={resetApp}
@@ -148,10 +169,19 @@ const Index = () => {
             </button>
           </div>
         </div>
+
+        {/* Right Panel with Tiled Image */}
+        <div
+          className="flex-1 bg-repeat bg-center"
+          style={{ backgroundImage: `url(${imageTileUrl})` }}
+        />
+
         <ConfettiEffect trigger={showConfetti} />
       </div>
     );
   }
+
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
