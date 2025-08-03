@@ -127,16 +127,18 @@ const Index = () => {
 
   if (isRevealed && imageUrl && imageTileUrl) {
     return (
-      <div className="min-h-screen flex bg-white">
-        {/* Left Panel with Tiled Image */}
+      <div className="min-h-screen relative bg-white flex items-center justify-center overflow-hidden">
+        {/* Subtle tiled background (hidden on mobile) */}
         <div
-          className="flex-1 bg-repeat bg-center"
+          className="absolute inset-0 bg-repeat bg-center opacity-60 md:block hidden"
           style={{ backgroundImage: `url(${imageTileUrl})` }}
         />
+        {/* White overlay to make background more subtle */}
+        <div className="absolute inset-0 bg-white/80 md:block hidden" />
 
-        {/* Middle Panel */}
-        <div className="relative z-10 w-full max-w-3xl min-h-screen flex items-center justify-center bg-white shadow-2xl shadow-black/30 overflow-hidden">
-          {/* Background Image with Gradient Fade */}
+        {/* Center content panel */}
+        <div className="relative z-10 w-full max-w-3xl min-h-screen flex items-center justify-center shadow-2xl shadow-black/20 overflow-hidden bg-white">
+          {/* Background image with soft gradient mask */}
           <div
             className="absolute inset-0 bg-center bg-no-repeat bg-cover pointer-events-none"
             style={{
@@ -147,10 +149,10 @@ const Index = () => {
                 "linear-gradient(to right, transparent, black 20%, black 80%, transparent)",
             }}
           >
-            <div className="absolute inset-0 bg-white/50" />
+            <div className="absolute inset-0 bg-white/60" />
           </div>
 
-          {/* Content */}
+          {/* Foreground content */}
           <div className="relative z-10 text-center px-6 py-12">
             <h1 className="text-6xl font-bold mb-8 animate-scale-in text-yellow-600 drop-shadow-lg">
               SUCCESS!
@@ -170,16 +172,11 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Right Panel with Tiled Image */}
-        <div
-          className="flex-1 bg-repeat bg-center"
-          style={{ backgroundImage: `url(${imageTileUrl})` }}
-        />
-
         <ConfettiEffect trigger={showConfetti} />
       </div>
     );
   }
+
 
 
 
@@ -205,7 +202,6 @@ const Index = () => {
 
         {invalid && <p className="text-red-400 animate-fade-in">Incorrect code. Try again.</p>}
 
-        <p className="text-sm text-white/60 mt-4">Hint: The code starts with 123...</p>
       </div>
     </div>
   );
