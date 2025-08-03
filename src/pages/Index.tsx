@@ -34,9 +34,26 @@ const deriveKey = async (passcode: string): Promise<CryptoKey> => {
 const decryptData = async (encString: string, key: CryptoKey): Promise<ArrayBuffer> => {
   const [ivHex, base64] = encString.trim().split(":");
   const iv = Uint8Array.from(ivHex.match(/.{1,2}/g)!.map((b) => parseInt(b, 16)));
-  const encryptedData = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+
+  const binaryStr = atob(base64);
+  const encryptedData = new Uint8Array(binaryStr.length);
+  for (let i = 0; i < binaryStr.length; i++) {
+    encryptedData[i] = binaryStr.charCodeAt(i);
+  }
+
   return crypto.subtle.decrypt({ name: "AES-CBC", iv }, key, encryptedData);
 };
+
+function arrayBufferToBase64(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
+
 
 const loadAndDecryptAsset = async (url: string, key: CryptoKey, asText = false): Promise<string | ArrayBuffer> => {
   const response = await fetch(url);
@@ -88,12 +105,12 @@ const Index = () => {
           try {
             const text = (await loadAndDecryptAsset("/encoded-text.enc", key, true)) as string;
             const imageBuffer = (await loadAndDecryptAsset("/encoded-image.enc", key)) as ArrayBuffer;
-            const imageBase64 = btoa(String.fromCharCode(...new Uint8Array(imageBuffer)));
+            const imageBase64 = arrayBufferToBase64(imageBuffer);
             const imageUrl = `data:image/jpeg;base64,${imageBase64}`;
             setImageUrl(imageUrl);
 
             const imageTileBuffer = (await loadAndDecryptAsset("/encoded-image-tile.enc", key)) as ArrayBuffer;
-            const imageTileBase64 = btoa(String.fromCharCode(...new Uint8Array(imageTileBuffer)));
+            const imageTileBase64 = arrayBufferToBase64(imageTileBuffer);
             const tileUrl = `data:image/jpeg;base64,${imageTileBase64}`;
             setImageTileUrl(tileUrl);
 
