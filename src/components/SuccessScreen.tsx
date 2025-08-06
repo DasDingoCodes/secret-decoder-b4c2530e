@@ -122,7 +122,7 @@ const SuccessScreen: React.FC<SuccessScreenProps> = ({
 
         <div className="relative z-10 flex flex-col justify-between items-center text-center px-6 py-12 w-full max-w-3xl h-full min-h-screen">
           {/* Title */}
-          <h1 className="text-5xl font-handwritten text-yellow-600 drop-shadow-lg leading-tight text-left w-full mb-8 whitespace-pre-wrap">
+          <h1 className="text-4xl font-handwritten text-yellow-600 drop-shadow-lg leading-tight text-left w-full mb-8 whitespace-pre-wrap">
             {title}
           </h1>
 
