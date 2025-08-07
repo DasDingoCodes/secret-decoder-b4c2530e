@@ -94,7 +94,7 @@ const SuccessScreen: React.FC<SuccessScreenProps> = ({
   const visibleText = revealedText.slice(0, visibleCharCount);
 
   // Break into title and paragraphs
-  const parts = visibleText.split(/\n\s*\n/);
+  const parts = revealedText.split(/\n\s*\n/);
   const title = parts[0] || "";
   const paragraphs = parts.slice(1);
 
@@ -123,12 +123,20 @@ const SuccessScreen: React.FC<SuccessScreenProps> = ({
         <div className="relative z-10 flex flex-col justify-between items-center text-center px-6 py-12 w-full max-w-3xl h-full min-h-screen">
           {/* Title */}
           <h1 className="text-4xl font-handwritten text-yellow-600 drop-shadow-lg leading-tight text-left w-full mb-8 whitespace-pre-wrap">
-            {title}
+            {title.split("").map((char, index) => (
+              <span
+                key={index}
+                className="inline-block opacity-0 animate-fadeInLetter"
+                style={{ animationDelay: `${index * 30}ms` }}
+              >
+                {char}
+              </span>
+            ))}
           </h1>
 
           {/* Paragraphs */}
           <div className="flex-1 overflow-y-auto w-full">
-            <div className="text-xl font-mono tracking-wide text-slate-800 text-left max-w-xl mx-auto leading-relaxed space-y-6 whitespace-pre-wrap">
+            <div className="text-xl tracking-wide text-slate-800 text-left max-w-xl mx-auto leading-relaxed space-y-6 whitespace-pre-wrap">
               {paragraphs.map((para, i) => (
                 <p key={i}>{para}</p>
               ))}
