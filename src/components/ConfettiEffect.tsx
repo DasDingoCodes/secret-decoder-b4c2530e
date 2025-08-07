@@ -36,18 +36,33 @@ const ConfettiEffect = ({ trigger, onComplete }: ConfettiEffectProps) => {
   const createParticles = () => {
     const newParticles: Particle[] = [];
     
-    // Create particles across the top of the screen
-    for (let i = 0; i < 40; i++) {
+    // Left cannon
+    for (let i = 0; i < 25; i++) {
       newParticles.push({
         id: Math.random(),
-        x: Math.random() * window.innerWidth,
-        y: -20 - Math.random() * 100, // Start above screen with staggered timing
-        vx: (Math.random() - 0.5) * 2, // Gentle horizontal drift
-        vy: Math.random() * 2 + 1, // Slow downward fall
+        x: -10,
+        y: window.innerHeight * 0.7,
+        vx: Math.random() * 8 + 4,
+        vy: -(Math.random() * 15 + 10),
         color: colors[Math.floor(Math.random() * colors.length)],
-        rotation: Math.random() * 360,
-        rotationSpeed: (Math.random() - 0.5) * 4,
-        size: Math.random() * 10 + 6
+        rotation: 0,
+        rotationSpeed: (Math.random() - 0.5) * 10,
+        size: Math.random() * 8 + 4
+      });
+    }
+
+    // Right cannon
+    for (let i = 0; i < 25; i++) {
+      newParticles.push({
+        id: Math.random(),
+        x: window.innerWidth + 10,
+        y: window.innerHeight * 0.7,
+        vx: -(Math.random() * 8 + 4),
+        vy: -(Math.random() * 15 + 10),
+        color: colors[Math.floor(Math.random() * colors.length)],
+        rotation: 0,
+        rotationSpeed: (Math.random() - 0.5) * 10,
+        size: Math.random() * 8 + 4
       });
     }
 
@@ -57,22 +72,21 @@ const ConfettiEffect = ({ trigger, onComplete }: ConfettiEffectProps) => {
 
   const animateParticles = (initialParticles: Particle[]) => {
     let animationParticles = [...initialParticles];
-    let time = 0;
+    const gravity = 0.3;
+    const airResistance = 0.99;
 
     const animate = () => {
-      time += 0.02;
-      
       animationParticles = animationParticles.map(particle => ({
         ...particle,
-        x: particle.x + particle.vx + Math.sin(time + particle.id) * 0.5, // Swaying motion
+        x: particle.x + particle.vx,
         y: particle.y + particle.vy,
-        vx: particle.vx * 0.998, // Very gentle air resistance
-        vy: Math.min(particle.vy + 0.02, 3), // Gentle gravity with terminal velocity
+        vx: particle.vx * airResistance,
+        vy: particle.vy + gravity,
         rotation: particle.rotation + particle.rotationSpeed
       })).filter(particle => 
         particle.y < window.innerHeight + 50 && 
-        particle.x > -100 && 
-        particle.x < window.innerWidth + 100
+        particle.x > -50 && 
+        particle.x < window.innerWidth + 50
       );
 
       setParticles([...animationParticles]);
