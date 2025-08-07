@@ -90,13 +90,11 @@ const SuccessScreen: React.FC<SuccessScreenProps> = ({
     onReset();
   };
 
-  // Text up to current character
-  const visibleText = revealedText.slice(0, visibleCharCount);
-
   // Break into title and paragraphs
   const parts = revealedText.split(/\n\s*\n/);
-  const title = parts[0] || "";
-  const paragraphs = parts.slice(1);
+  const title_1 = parts[0] || "";
+  const title_2 = parts[1] || "";
+  const paragraphs = parts.slice(2);
 
   return (
     <div className="min-h-screen relative bg-white flex items-center justify-center overflow-hidden">
@@ -137,8 +135,8 @@ const SuccessScreen: React.FC<SuccessScreenProps> = ({
 
         <div className="relative z-10 flex flex-col justify-between items-center text-center px-6 py-12 w-full max-w-3xl h-full min-h-screen">
           {/* Title */}
-          <h1 className="text-4xl font-handwritten text-yellow-600 drop-shadow-lg leading-tight text-left w-full mb-8 whitespace-pre-wrap">
-            {title.split("").map((char, index) => (
+          <h2 className="text-4xl font-handwritten text-yellow-600 drop-shadow-lg text-left w-full whitespace-pre-wrap pl-0 md:pl-16">
+            {title_1.split("").map((char, index) => (
               <span
                 key={index}
                 className="inline-block opacity-0 animate-fadeInLetter"
@@ -147,7 +145,19 @@ const SuccessScreen: React.FC<SuccessScreenProps> = ({
                 {char}
               </span>
             ))}
-          </h1>
+          </h2>
+
+          <h2 className="text-4xl font-handwritten text-yellow-600 drop-shadow-lg text-left w-full whitespace-pre-wrap pl-0 md:pl-16 mb-8">
+            {title_2.split("").map((char, index) => (
+              <span
+                key={index}
+                className="inline-block opacity-0 animate-fadeInLetter"
+                style={{ animationDelay: `${index * 1}ms` }}
+              >
+                {char}
+              </span>
+            ))}
+          </h2>
 
           {/* Paragraphs */}
           <div className="flex-1 overflow-y-auto w-full">
