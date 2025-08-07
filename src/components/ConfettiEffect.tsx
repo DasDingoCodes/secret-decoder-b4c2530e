@@ -18,9 +18,9 @@ interface ConfettiEffectProps {
 }
 
 const colors = [
-  "#FFB3D1", "#B3E5FF", "#FFCCB3", "#D1FFB3", "#E5B3FF", 
-  "#FFE5B3", "#B3FFD1", "#FFD1B3", "#D1B3FF", "#B3FFCC",
-  "#FFCCE5", "#CCE5FF", "#E5FFCC", "#FFCCDD", "#CCFFDD"
+  "#FFE066", "#F4E4BC", "#FFEAA7", "#FFD700", "#FFFFFF", 
+  "#FFF8DC", "#FFFACD", "#FFB6C1", "#FFCCCB", "#FFB3BA",
+  "#FF91A4", "#FF6B6B", "#FF7F7F", "#FFEFD5", "#FFEBCD"
 ];
 
 const ConfettiEffect = ({ trigger, onComplete }: ConfettiEffectProps) => {
