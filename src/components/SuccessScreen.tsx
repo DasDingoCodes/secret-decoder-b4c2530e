@@ -40,7 +40,7 @@ const SuccessScreen: React.FC<SuccessScreenProps> = ({
           return prev;
         }
       });
-    }, 25); // 25ms per character
+    }, 1); // 25ms per character
 
     return () => clearInterval(interval);
   }, [visibleCharCount, characters.length]);
@@ -107,8 +107,23 @@ const SuccessScreen: React.FC<SuccessScreenProps> = ({
       <div className="absolute inset-0 bg-white/80 md:block hidden" />
 
       <div className="relative z-10 w-full max-w-3xl min-h-screen flex items-center justify-center shadow-2xl shadow-black/20 overflow-hidden bg-white">
+        {/* Mobile-only background (fixed) */}
         <div
-          className="absolute inset-0 bg-center bg-no-repeat bg-cover pointer-events-none"
+          className="fixed top-0 left-0 w-full h-full bg-center bg-no-repeat bg-cover pointer-events-none z-0 md:hidden"
+          style={{
+            backgroundImage: `url(${imageUrl})`,
+            maskImage:
+              "linear-gradient(to right, transparent, black 20%, black 80%, transparent)",
+            WebkitMaskImage:
+              "linear-gradient(to right, transparent, black 20%, black 80%, transparent)",
+          }}
+        >
+          <div className="absolute inset-0 bg-white/60" />
+        </div>
+
+        {/* Desktop-only background (absolute) */}
+        <div
+          className="absolute inset-0 bg-center bg-no-repeat bg-cover pointer-events-none hidden md:block"
           style={{
             backgroundImage: `url(${imageUrl})`,
             maskImage:
@@ -127,7 +142,7 @@ const SuccessScreen: React.FC<SuccessScreenProps> = ({
               <span
                 key={index}
                 className="inline-block opacity-0 animate-fadeInLetter"
-                style={{ animationDelay: `${index * 30}ms` }}
+                style={{ animationDelay: `${index * 1}ms` }}
               >
                 {char}
               </span>
