@@ -62,9 +62,9 @@ const loadAndDecryptAsset = async (url: string, key: CryptoKey, asText = false):
 };
 
 const DECRYPTION_MESSAGES = [
-  "🔐 Unlocking secret vault...",
-  "🎨 Preparing your surprise...", 
-  "🎵 Tuning the audio experience...",
+  "Decrypting secret assets...",
+  "Calling the power of the personified evil...", 
+  "Debating database models...",
   "✨ Making everything perfect..."
 ];
 
@@ -98,6 +98,8 @@ const Index = () => {
   useEffect(() => {
     const tryReveal = async () => {
       if (code.length === 6 && !isRevealed && !isDecrypting && passcodeHash) {
+
+        // Nice try, but no. You got to know the code.
         const hash = await hashCode(code);
         if (hash === passcodeHash) {
           setIsDecrypting(true);
