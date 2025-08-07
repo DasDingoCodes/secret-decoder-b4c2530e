@@ -18,9 +18,9 @@ interface ConfettiEffectProps {
 }
 
 const colors = [
-  "#FFE066", "#F4E4BC", "#FFEAA7", "#FFD700", "#FFFFFF", 
-  "#FFF8DC", "#FFFACD", "#FFB6C1", "#FFCCCB", "#FFB3BA",
-  "#FF91A4", "#FF6B6B", "#FF7F7F", "#FFEFD5", "#FFEBCD"
+  "#FFE066", "#F4E4BC", "#FFEAA7", "#ffe867ff", "#FFFFFF", 
+  "#FFF8DC", "#FFFACD", "#FFB6C1", "#FFCCCB", "#ffe797ff",
+  "#ffa9b7ff", "#f8e8bcff", "#ffd8a6ff", "#FFEFD5", "#FFEBCD"
 ];
 
 const ConfettiEffect = ({ trigger, onComplete }: ConfettiEffectProps) => {
@@ -38,7 +38,7 @@ const ConfettiEffect = ({ trigger, onComplete }: ConfettiEffectProps) => {
     const newParticles: Particle[] = [];
     
     // Left cannon
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 100; i++) {
       newParticles.push({
         id: Math.random(),
         x: -10,
@@ -53,7 +53,7 @@ const ConfettiEffect = ({ trigger, onComplete }: ConfettiEffectProps) => {
     }
 
     // Right cannon
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 100; i++) {
       newParticles.push({
         id: Math.random(),
         x: window.innerWidth + 10,
