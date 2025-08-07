@@ -18,8 +18,9 @@ interface ConfettiEffectProps {
 }
 
 const colors = [
-  "#ff9f9fff", "#fff6a0ff", "#b8ee8bff", "#ffd595ff", "#b4e2cdff", 
-  "#ffedb4ff", "#a0ddc1ff", "#adddb9ff", "#f1dc84ff", "#a1cea5ff"
+  "#FFB3D1", "#B3E5FF", "#FFCCB3", "#D1FFB3", "#E5B3FF", 
+  "#FFE5B3", "#B3FFD1", "#FFD1B3", "#D1B3FF", "#B3FFCC",
+  "#FFCCE5", "#CCE5FF", "#E5FFCC", "#FFCCDD", "#CCFFDD"
 ];
 
 const ConfettiEffect = ({ trigger, onComplete }: ConfettiEffectProps) => {
@@ -37,32 +38,32 @@ const ConfettiEffect = ({ trigger, onComplete }: ConfettiEffectProps) => {
     const newParticles: Particle[] = [];
     
     // Left cannon
-    for (let i = 0; i < 25; i++) {
+    for (let i = 0; i < 50; i++) {
       newParticles.push({
         id: Math.random(),
         x: -10,
         y: window.innerHeight * 0.7,
-        vx: Math.random() * 8 + 4,
-        vy: -(Math.random() * 15 + 10),
+        vx: Math.random() * 10 + 5,
+        vy: -(Math.random() * 20 + 15),
         color: colors[Math.floor(Math.random() * colors.length)],
         rotation: 0,
-        rotationSpeed: (Math.random() - 0.5) * 10,
-        size: Math.random() * 8 + 4
+        rotationSpeed: (Math.random() - 0.5) * 8,
+        size: Math.random() * 10 + 4
       });
     }
 
     // Right cannon
-    for (let i = 0; i < 25; i++) {
+    for (let i = 0; i < 50; i++) {
       newParticles.push({
         id: Math.random(),
         x: window.innerWidth + 10,
         y: window.innerHeight * 0.7,
-        vx: -(Math.random() * 8 + 4),
-        vy: -(Math.random() * 15 + 10),
+        vx: -(Math.random() * 10 + 5),
+        vy: -(Math.random() * 20 + 15),
         color: colors[Math.floor(Math.random() * colors.length)],
         rotation: 0,
-        rotationSpeed: (Math.random() - 0.5) * 10,
-        size: Math.random() * 8 + 4
+        rotationSpeed: (Math.random() - 0.5) * 8,
+        size: Math.random() * 10 + 4
       });
     }
 
@@ -72,21 +73,33 @@ const ConfettiEffect = ({ trigger, onComplete }: ConfettiEffectProps) => {
 
   const animateParticles = (initialParticles: Particle[]) => {
     let animationParticles = [...initialParticles];
-    const gravity = 0.3;
-    const airResistance = 0.99;
+    const gravity = 0.4;
+    const airResistance = 0.98;
+    const floatAmplitude = 2;
 
     const animate = () => {
-      animationParticles = animationParticles.map(particle => ({
-        ...particle,
-        x: particle.x + particle.vx,
-        y: particle.y + particle.vy,
-        vx: particle.vx * airResistance,
-        vy: particle.vy + gravity,
-        rotation: particle.rotation + particle.rotationSpeed
-      })).filter(particle => 
-        particle.y < window.innerHeight + 50 && 
-        particle.x > -50 && 
-        particle.x < window.innerWidth + 50
+      animationParticles = animationParticles.map((particle, index) => {
+        let newVx = particle.vx * airResistance;
+        let newVy = particle.vy + gravity;
+        
+        // Add gentle swaying motion when falling (after reaching peak)
+        if (particle.vy > 0) {
+          newVx += Math.sin(Date.now() * 0.003 + index) * 0.1;
+          newVy *= 0.95; // Slower falling for floating effect
+        }
+        
+        return {
+          ...particle,
+          x: particle.x + newVx,
+          y: particle.y + newVy,
+          vx: newVx,
+          vy: newVy,
+          rotation: particle.rotation + particle.rotationSpeed * 0.8
+        };
+      }).filter(particle => 
+        particle.y < window.innerHeight + 100 && 
+        particle.x > -100 && 
+        particle.x < window.innerWidth + 100
       );
 
       setParticles([...animationParticles]);
